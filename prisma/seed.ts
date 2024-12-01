@@ -1,21 +1,26 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma: PrismaClient = 1 as any;
+const prismaFactory = () => {
+  const prisma = new PrismaClient();
 
-prisma.user.create({
-  data:  {
-    name: 'Alice',
-    email: 'alice@prisma.io',
-    posts: {
-      create: [
-        {
-          title: 'Join the Prisma Discord',
-          content: 'https://pris.ly/discord',
-          published: true,
-          // Should error.
-          meta: 5,
-        },
-      ],
-    },
-  }
-})
+  // This one errors.
+  // return prisma;
+
+  // This one doesn't.
+  return extendPrisma(prisma);
+};
+
+function extendPrisma(prisma: PrismaClient) {
+  return prisma.$extends({});
+}
+
+type PrismaService = ReturnType<typeof prismaFactory>;
+
+const prisma: PrismaService = 1 as any;
+
+prisma.orders.create({
+  data: {
+    // Should error.
+    meta: 5,
+  },
+});
