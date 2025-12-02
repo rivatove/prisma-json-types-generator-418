@@ -1,26 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
-const prismaFactory = () => {
-  const prisma = new PrismaClient();
+const prisma: PrismaClient = 1 as any;
 
-  // This one errors.
-  // return prisma;
+async () => {
+  const aggregates = await prisma.orders.groupBy({
+    by: ['meta'],
+    _count: true,
+  });
 
-  // This one doesn't.
-  return extendPrisma(prisma);
-};
-
-function extendPrisma(prisma: PrismaClient) {
-  return prisma.$extends({});
+  for (const aggregate of aggregates) {
+    // The type of data is JsonValue, not the expected SampleJson
+    const data = aggregate.meta
+  }
 }
-
-type PrismaService = ReturnType<typeof prismaFactory>;
-
-const prisma: PrismaService = 1 as any;
-
-prisma.orders.create({
-  data: {
-    // Should error.
-    meta: 5,
-  },
-});
